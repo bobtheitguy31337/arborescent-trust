@@ -1,0 +1,91 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data Files (uncomment if you want to ignore large datasets)
+# *.csv
+# *.json
+# *.parquet
+# data/
+# datasets/
+
+# Model files and checkpoints
+*.pkl
+*.h5
+*.pth
+*.ckpt
+*.model
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Documentation builds
+docs/_build/
+site/
+
+# Research artifacts
+experiments/
+results/
+outputs/
+checkpoints/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
