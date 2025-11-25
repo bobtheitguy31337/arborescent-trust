@@ -35,6 +35,7 @@ class TreeNode(BaseModel):
     """Recursive tree node for invite tree visualization."""
     id: str
     username: str
+    email: str
     status: str
     created_at: datetime
     depth: int

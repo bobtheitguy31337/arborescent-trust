@@ -19,6 +19,8 @@ class AdminStatsResponse(BaseModel):
     total_invites_used: int
     avg_health_score: float
     low_health_users: int
+    recent_registrations_24h: int
+    recent_registrations_7d: int
 
 
 class UserFlagRequest(BaseModel):
@@ -100,7 +102,7 @@ class AuditLogEntry(BaseModel):
 
 class AuditLogResponse(BaseModel):
     """Response schema for audit log."""
-    entries: List[AuditLogEntry]
+    logs: List[AuditLogEntry]
     total: int
     page: int
     page_size: int

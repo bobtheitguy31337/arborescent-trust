@@ -43,19 +43,32 @@ async def get_my_profile(current_user: User = Depends(get_current_user)):
     )
 
 
-@router.get("/{user_id}", response_model=UserPublicProfile)
+@router.get("/{user_identifier}", response_model=UserPublicProfile)
 async def get_user_profile(
-    user_id: UUID,
+    user_identifier: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_optional_user)
 ):
     """
     Get public user profile.
     
+    - **user_identifier**: User ID (UUID), username, or email
+    
     Returns limited information for privacy.
     """
-    tree_service = TreeService(db)
-    user = tree_service.get_user_or_404(user_id)
+    # Look up user by ID, username, or email
+    try:
+        user_id = UUID(user_identifier)
+        user = db.query(User).filter(User.id == user_id, User.deleted_at == None).first()
+    except ValueError:
+        # Not a UUID, try username or email
+        user = db.query(User).filter(
+            ((User.username == user_identifier) | (User.email == user_identifier)),
+            User.deleted_at == None
+        ).first()
+    
+    if not user:
+        raise not_found_error("User not found")
     
     return UserPublicProfile(
         id=str(user.id),
@@ -66,9 +79,9 @@ async def get_user_profile(
     )
 
 
-@router.get("/{user_id}/tree", response_model=UserTreeResponse)
+@router.get("/{user_identifier}/tree", response_model=UserTreeResponse)
 async def get_user_tree(
-    user_id: UUID,
+    user_identifier: str,
     max_depth: int = 5,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -76,10 +89,26 @@ async def get_user_tree(
     """
     Get invite tree for a user (their descendants).
     
+    - **user_identifier**: User ID (UUID), username, or email
     - **max_depth**: Maximum depth to include (default 5)
     
     Users can only view their own tree unless they're an admin.
     """
+    # Look up user by ID, username, or email
+    try:
+        user_id = UUID(user_identifier)
+        target_user = db.query(User).filter(User.id == user_id).first()
+    except ValueError:
+        # Not a UUID, try username or email
+        target_user = db.query(User).filter(
+            (User.username == user_identifier) | (User.email == user_identifier)
+        ).first()
+    
+    if not target_user:
+        raise not_found_error("User not found")
+    
+    user_id = target_user.id
+    
     # Privacy check
     if str(current_user.id) != str(user_id) and not current_user.is_admin:
         raise forbidden_error("Can only view your own tree")
@@ -116,6 +145,7 @@ async def get_user_tree(
         return TreeNode(
             id=data["id"],
             username=data["username"],
+            email=data["email"],
             status=data["status"],
             created_at=data["created_at"],
             depth=data["depth"],

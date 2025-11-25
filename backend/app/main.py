@@ -49,6 +49,27 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+# Rate limiting middleware
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    """Apply rate limiting based on endpoint and client."""
+    from app.core.rate_limit import AUTH_RATE_LIMIT, INVITE_RATE_LIMIT, ADMIN_RATE_LIMIT, DEFAULT_RATE_LIMIT
+    
+    path = request.url.path
+    
+    # Select appropriate rate limiter based on path
+    if path.startswith("/api/auth/"):
+        rate_limiter = AUTH_RATE_LIMIT
+    elif path.startswith("/api/invites/"):
+        rate_limiter = INVITE_RATE_LIMIT
+    elif path.startswith("/api/admin/"):
+        rate_limiter = ADMIN_RATE_LIMIT
+    else:
+        rate_limiter = DEFAULT_RATE_LIMIT
+    
+    return await rate_limiter(request, call_next)
+
+
 # Exception handlers
 @app.exception_handler(InsufficientQuotaException)
 async def insufficient_quota_handler(request: Request, exc: InsufficientQuotaException):

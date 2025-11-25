@@ -67,6 +67,22 @@ async def get_admin_stats(
         UserHealthScore.overall_health < 50
     ).count()
     
+    # Recent registrations
+    from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    day_ago = now - timedelta(days=1)
+    week_ago = now - timedelta(days=7)
+    
+    recent_24h = db.query(User).filter(
+        User.created_at >= day_ago,
+        User.deleted_at == None
+    ).count()
+    
+    recent_7d = db.query(User).filter(
+        User.created_at >= week_ago,
+        User.deleted_at == None
+    ).count()
+    
     return AdminStatsResponse(
         total_users=total_users,
         active_users=active_users,
@@ -77,11 +93,13 @@ async def get_admin_stats(
         total_invites_issued=total_invites,
         total_invites_used=used_invites,
         avg_health_score=float(avg_health),
-        low_health_users=low_health
+        low_health_users=low_health,
+        recent_registrations_24h=recent_24h,
+        recent_registrations_7d=recent_7d
     )
 
 
-@router.get("/users", response_model=list)
+@router.get("/users")
 async def list_users(
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=100),
@@ -413,7 +431,7 @@ async def get_audit_log(
         ))
     
     return AuditLogResponse(
-        entries=audit_entries,
+        logs=audit_entries,
         total=total,
         page=page,
         page_size=page_size
