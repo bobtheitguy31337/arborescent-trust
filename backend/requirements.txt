@@ -31,3 +31,6 @@ httpx==0.25.2
 # Monitoring (optional)
 sentry-sdk==1.38.0
 
+# Media processing
+Pillow==10.1.0
+

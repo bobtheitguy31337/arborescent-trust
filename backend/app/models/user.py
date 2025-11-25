@@ -57,10 +57,24 @@ class User(Base):
     deleted_at = Column(DateTime(timezone=True), nullable=True, index=True)
     deleted_reason = Column(Text, nullable=True)
     
+    # Profile fields (for social media)
+    display_name = Column(String(100), nullable=True)
+    bio = Column(Text, nullable=True)
+    avatar_url = Column(String(500), nullable=True)
+    banner_url = Column(String(500), nullable=True)
+    location = Column(String(100), nullable=True)
+    website = Column(String(200), nullable=True)
+    
+    # Social counters (denormalized for performance)
+    follower_count = Column(Integer, default=0)
+    following_count = Column(Integer, default=0)
+    post_count = Column(Integer, default=0)
+    
     # Relationships
     invited_by = relationship("User", remote_side=[id], backref="invited_users")
     created_tokens = relationship("InviteToken", foreign_keys="InviteToken.created_by_user_id", back_populates="creator")
     used_token = relationship("InviteToken", foreign_keys="InviteToken.used_by_user_id", back_populates="used_by_user", uselist=False)
+    posts = relationship("Post", back_populates="author", foreign_keys="Post.user_id")
     
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', status='{self.status}')>"

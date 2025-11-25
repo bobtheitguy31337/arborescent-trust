@@ -10,7 +10,7 @@ import time
 
 from app.config import settings
 from app.database import engine, Base
-from app.api import auth, invites, users, admin
+from app.api import auth, invites, users, admin, posts, social, media
 from app.core.exceptions import (
     InviteTreeException,
     InsufficientQuotaException,
@@ -122,6 +122,9 @@ app.include_router(auth.router)
 app.include_router(invites.router)
 app.include_router(users.router)
 app.include_router(admin.router)
+app.include_router(posts.router)
+app.include_router(social.router)
+app.include_router(media.router)
 
 
 # Root endpoint
